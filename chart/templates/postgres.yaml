@@ -8,6 +8,31 @@ stringData:
   POSTGRES_DB: {{ .Values.postgres.database }}
   POSTGRES_USER: {{ .Values.postgres.user }}
   POSTGRES_PASSWORD: {{ .Values.postgres.password }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS items (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100) NOT NULL DEFAULT '@anonymous',
+        community VARCHAR(100) NOT NULL DEFAULT 'r/general',
+        content TEXT NOT NULL,
+        upvotes INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        title VARCHAR(255),
+        author VARCHAR(100)
+    );
+
+    INSERT INTO items (username, community, content, upvotes)
+    VALUES 
+      ('@praneeth', 'r/kubernetes', 'Welcome to the Cloud-Native GitOps Platform on Azure AKS! 🚀', 42),
+      ('@alex_devops', 'r/gitops', 'ArgoCD is continuously reconciling state from gitops-manifests.', 18),
+      ('@cloud_architect', 'r/azure', 'Azure CNI + Network Policies running with containerd on Ubuntu 24.04.', 27)
+    ON CONFLICT DO NOTHING;
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -54,12 +79,17 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d
           resources:
             {{- toYaml .Values.postgres.resources | nindent 12 }}
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
+        - name: postgres-init
+          configMap:
+            name: postgres-init-sql
 ---
 apiVersion: v1
 kind: Service

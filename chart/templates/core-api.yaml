@@ -7,6 +7,11 @@ metadata:
     app: core-api
 spec:
   replicas: {{ .Values.coreApi.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: core-api

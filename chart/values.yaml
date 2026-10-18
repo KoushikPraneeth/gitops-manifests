@@ -65,7 +65,7 @@ coreApi:
   replicaCount: 2
   image:
     repository: acrdevpk.azurecr.io/core-api
-    tag: "v1"
+    tag: "v2"
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -89,7 +89,7 @@ webClient:
   replicaCount: 2
   image:
     repository: acrdevpk.azurecr.io/web-client
-    tag: "v1"
+    tag: "v2"
     pullPolicy: Always
   service:
     type: ClusterIP

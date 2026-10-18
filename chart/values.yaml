@@ -1,0 +1,114 @@
+global:
+  environment: dev
+
+# 1. Database Tier
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  port: 5432
+  database: platform_db
+  user: postgres
+  password: postgrespassword123
+  persistence:
+    enabled: true
+    storageClass: "managed-csi"
+    size: 1Gi
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# 2. In-Memory Cache Tier
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  port: 6379
+  resources:
+    limits:
+      cpu: 150m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# 3. East-West Audit Service
+notifyService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: acrdevpk.azurecr.io/notify-service
+    tag: "v1"
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 8001
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# 4. Core API Backend
+coreApi:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: acrdevpk.azurecr.io/core-api
+    tag: "v1"
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 8000
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# 5. Frontend Dashboard
+webClient:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: acrdevpk.azurecr.io/web-client
+    tag: "v1"
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    NEXT_PUBLIC_API_URL: "/api"
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# 6. East-West Kubernetes Network Policy
+networkPolicy:
+  enabled: true
+
+# 7. Ingress NGINX Routing
+ingress:
+  enabled: true
+  className: "nginx"

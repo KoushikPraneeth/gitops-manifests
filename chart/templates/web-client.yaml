@@ -1,0 +1,59 @@
+{{- if .Values.webClient.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-client
+  labels:
+    app: web-client
+spec:
+  replicas: {{ .Values.webClient.replicaCount }}
+  selector:
+    matchLabels:
+      app: web-client
+  template:
+    metadata:
+      labels:
+        app: web-client
+    spec:
+      containers:
+        - name: web-client
+          image: "{{ .Values.webClient.image.repository }}:{{ .Values.webClient.image.tag }}"
+          imagePullPolicy: {{ .Values.webClient.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.webClient.service.port }}
+              name: http
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: {{ .Values.webClient.env.NEXT_PUBLIC_API_URL | quote }}
+            - name: PORT
+              value: "3000"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.webClient.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-client
+  labels:
+    app: web-client
+spec:
+  type: {{ .Values.webClient.service.type }}
+  ports:
+    - port: {{ .Values.webClient.service.port }}
+      targetPort: 3000
+      name: http
+  selector:
+    app: web-client
+{{- end }}

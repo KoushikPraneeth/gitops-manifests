@@ -86,7 +86,7 @@ coreApi:
 # 5. Frontend Dashboard
 webClient:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   image:
     repository: acrdevpk.azurecr.io/web-client
     tag: "v2"

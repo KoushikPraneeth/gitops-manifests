@@ -112,3 +112,9 @@ networkPolicy:
 ingress:
   enabled: true
   className: "nginx"
+
+# 8. Prometheus ServiceMonitor
+serviceMonitor:
+  enabled: true
+  interval: "15s"
+

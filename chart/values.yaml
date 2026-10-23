@@ -46,7 +46,7 @@ notifyService:
   replicaCount: 1
   image:
     repository: acrdevpk.azurecr.io/notify-service
-    tag: "758b2a3f53a985a9526b609105dc1a27a4dfbd78"
+    tag: "9e3622d97599fff1bec6296dc9bc4a96fe104fad"
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -65,7 +65,7 @@ coreApi:
   replicaCount: 2
   image:
     repository: acrdevpk.azurecr.io/core-api
-    tag: "758b2a3f53a985a9526b609105dc1a27a4dfbd78"
+    tag: "9e3622d97599fff1bec6296dc9bc4a96fe104fad"
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -89,7 +89,7 @@ webClient:
   replicaCount: 1
   image:
     repository: acrdevpk.azurecr.io/web-client
-    tag: "758b2a3f53a985a9526b609105dc1a27a4dfbd78"
+    tag: "9e3622d97599fff1bec6296dc9bc4a96fe104fad"
     pullPolicy: Always
   service:
     type: ClusterIP
